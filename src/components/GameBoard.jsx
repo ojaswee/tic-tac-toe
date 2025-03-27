@@ -1,36 +1,44 @@
-import { useState } from "react";
+import { useState } from 'react';
 
-//create 3 nested arrays to represent the 3 rows of the game board
-const initalGameBorad = [
-	[null, null, null],
-	[null, null, null],
-	[null, null, null]
+const initialGameBoard = [
+  [null, null, null],
+  [null, null, null],
+  [null, null, null],
 ];
 
+export default function GameBoard({ onSelectSquare, activePlayerSymbol }) {
+  const [gameBoard, setGameBoard] = useState(initialGameBoard);
 
-export default function GameBoard() {
-	const [gameBoard, setGameBoard] = useState(initalGameBorad);
+  function handleSquareClick(rowIndex, colIndex) {
+    setGameBoard((prevGameBoard) => {
+      // Create a deep copy of the game board
+      const updatedGameBoard = prevGameBoard.map((row) => [...row]);
 
-	function handleSquareClick(rowIndex, colIndex) {
-		setGameBoard((prevGameBoard) => {
-			const updatedGameBoard = [...prevGameBoard.map(innerArray => [...innerArray])];
-			updatedGameBoard[rowIndex][colIndex] = 'X';
-			return updatedGameBoard;
-		});
-	}
+      // Update the clicked square if it's empty
+      if (!updatedGameBoard[rowIndex][colIndex]) {
+        updatedGameBoard[rowIndex][colIndex] = activePlayerSymbol;
+        onSelectSquare(); // Switch the active player
+      }
 
-	return (
-		<ol id="game-board">
-			{gameBoard.map((row, rowIndex) => (
-				<li key={rowIndex}>
-					<ol>
-						{row.map((playerSymbol, colIndex) => <li key={colIndex}>
-							<button onClick={() => handleSquareClick(rowIndex, colIndex)}>{playerSymbol}</button>
-						</li>)}
-					</ol>
-				</li>
-			)
-			)}
-		</ol>
-	);
+      return updatedGameBoard;
+    });
+  }
+
+  return (
+    <div id="game-board">
+      {gameBoard.map((row, rowIndex) => (
+        <ol key={rowIndex} className="board-row">
+          {row.map((cell, colIndex) => (
+            <button
+              key={colIndex}
+              className="board-cell"
+              onClick={() => handleSquareClick(rowIndex, colIndex)}
+            >
+              {cell}
+            </button>
+          ))}
+        </ol>
+      ))}
+    </div>
+  );
 }
